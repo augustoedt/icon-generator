@@ -1,7 +1,9 @@
+/* eslint-disable @next/next/no-img-element */
 import { type NextPage } from "next";
-import { signIn } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
 import { Input } from "~/components/Input";
 import { api } from "~/utils/api";
@@ -13,16 +15,26 @@ const GeneratePage: NextPage = () => {
     prompt: "",
   });
 
-  const generateIcon = api.generate.generateIcon.useMutation({
+  const [imageUrl, setImageUrl] = useState("");
+
+  const generationIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
-      console.log("success", data)
+
+      if(!data.imageUrl) return;
+      
+      console.log("success", data.imageUrl)
+
+      setImageUrl(data.imageUrl)
+
     },
   });
 
   function handleSubmit(e: FormEvent){
     e.preventDefault();
     // submit form data to the backend
-    generateIcon
+    generationIcon.mutate({
+      prompt: form.prompt,
+    })
   }
 
   function updateForm(key: string){
@@ -32,6 +44,10 @@ const GeneratePage: NextPage = () => {
       [key]: e.target.value}));
   }}
 
+  const session = useSession();
+
+  const isLoggedIn = !!session.data
+
   return (<>
       <Head>
         <title>Create</title>
@@ -39,15 +55,18 @@ const GeneratePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex flex-col min-h-screen justify-center items-center">
-        <button onClick={()=>{signIn().catch(console.error)}} className="rounded bg-white px-4 py-2 hover:bg-blue-500">Login</button>
+        {!isLoggedIn && <Button onClick={()=>{signIn().catch(console.error)}} >Login</Button>}
+        {isLoggedIn && <Button onClick={()=>{signOut().catch(console.error)}} >Logout</Button>}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <FormGroup>
             <label className="text-gray-100 font-bold text-lg">Prompt</label>
             <Input value={form.prompt} onChange={updateForm("prompt")} type="text" />
           </FormGroup>
 
-          <button className="rounded bg-blue-400 px-4 py-2 hover:bg-blue-500">Submit</button>
+          <button className="rounded bg-blue-400 px-4 py-2 hover:bg-blue-500 text-white">Submit</button>
         </form>
+
+        <img src={imageUrl} alt="generated icon" />
       </main>
     </>);
 };
