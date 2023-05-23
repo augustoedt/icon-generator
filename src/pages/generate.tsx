@@ -1,4 +1,5 @@
 import { type NextPage } from "next";
+import { signIn } from "next-auth/react";
 import Head from "next/head";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { FormGroup } from "~/components/FormGroup";
@@ -38,6 +39,7 @@ const GeneratePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex flex-col min-h-screen justify-center items-center">
+        <button onClick={()=>{signIn().catch(console.error)}} className="rounded bg-white px-4 py-2 hover:bg-blue-500">Login</button>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <FormGroup>
             <label className="text-gray-100 font-bold text-lg">Prompt</label>
