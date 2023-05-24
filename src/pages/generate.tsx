@@ -2,6 +2,7 @@
 import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
+import Image from "next/image";
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
@@ -66,7 +67,7 @@ const GeneratePage: NextPage = () => {
           <button className="rounded bg-blue-400 px-4 py-2 hover:bg-blue-500 text-white">Submit</button>
         </form>
 
-        <img src={imageUrl} alt="generated icon" />
+        {imageUrl.length > 0 && <Image width="100" height="100" src={`data:image/png;base64,${imageUrl}`} alt="generated image icon" />}
       </main>
     </>);
 };
