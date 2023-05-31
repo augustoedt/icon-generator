@@ -19,7 +19,8 @@ const config = {
   images: {
     domains: [
       "picsum.photos",
-      "oaidalleapiprodscus.blob.core.windows.net"
+      "oaidalleapiprodscus.blob.core.windows.net",
+      "icon-ai-generator.s3.sa-east-1.amazonaws.com",
     ],
   },
   i18n: {
