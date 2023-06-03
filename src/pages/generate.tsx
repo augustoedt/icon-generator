@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
@@ -9,12 +8,13 @@ import { FormGroup } from "~/components/FormGroup";
 import { Input } from "~/components/Input";
 import { api } from "~/utils/api";
 
-
 const GeneratePage: NextPage = () => {
 
   const [form, setForm] = useState({
     prompt: "",
   });
+
+  const icons = api.icons.generateIcon.useQuery();
 
   const [imageUrl, setImageUrl] = useState("");
 
@@ -69,7 +69,20 @@ const GeneratePage: NextPage = () => {
         <button className="rounded bg-blue-400 px-4 py-2 hover:bg-blue-500 text-white">Submit</button>
       </form>
 
-      {imageUrl.length > 0 && <Image width="900" height="900" src={`data:image/png;base64,${imageUrl}`} alt="generated image icon" />}
+      {imageUrl.length > 0 && <Image width="600" height="600" src={`${imageUrl}`} alt="generated image icon" />}
+
+      {/* generate a list of image with max 5 columns*/}
+      <ul className="grid grid-cols-5 gap-4">
+        {icons.data?.icons.map((icon) => (<li key={icon.id}>
+          <Image
+            className="rounded-lg shadow-lg shadow-gray-400 border-2 border-white"
+            width="250"
+            height="250"
+            src={`https://icon-ai-generator.s3.sa-east-1.amazonaws.com/${icon.id}`}
+            alt={`${icon.prompt ?? " "}: generated image icon`} />
+        </li>
+        ))}
+      </ul>
     </main>
   </>);
 };
