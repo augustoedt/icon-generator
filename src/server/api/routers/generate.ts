@@ -65,6 +65,14 @@ export const generateRouter = createTRPCRouter({
 
       const base64EncodedImage = await generateIcon(input.prompt);
 
+      if (env.DALLE_MOCK == "true") {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        return {
+          imageUrl:
+            "https://icon-ai-generator.s3.sa-east-1.amazonaws.com/clihmso0d0000210c6g65sudx",
+        };
+      }
+
       if (!base64EncodedImage) {
         throw new TRPCError({
           code: "BAD_REQUEST",
@@ -92,7 +100,7 @@ export const generateRouter = createTRPCRouter({
         .promise();
 
       return {
-        imageUrl: `https://${BUCKET_NAME}.s3.amazonaws.com/${icon.id}`,
+        imageUrl: `https://${BUCKET_NAME}.s3.sa-east-1.amazonaws.com/${icon.id}`,
       };
     }),
 });

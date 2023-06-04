@@ -6,9 +6,13 @@ import { useState, type ChangeEvent, type FormEvent } from "react";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
 import { Input } from "~/components/Input";
+import { LoadingButton } from "~/components/LoadingButton";
 import { api } from "~/utils/api";
 
 const GeneratePage: NextPage = () => {
+  const session = useSession();
+
+  const isLoggedIn = !!session.data
 
   const [form, setForm] = useState({
     prompt: "",
@@ -18,12 +22,12 @@ const GeneratePage: NextPage = () => {
 
   const [imageUrl, setImageUrl] = useState("");
 
+  const [loading, setLoading] = useState(false);
+
   const generationIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
 
       if (!data.imageUrl) return;
-
-      console.log("success", data.imageUrl)
 
       setImageUrl(data.imageUrl)
 
@@ -33,9 +37,13 @@ const GeneratePage: NextPage = () => {
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     // submit form data to the backend
+    setLoading(true);
+
     generationIcon.mutate({
       prompt: form.prompt,
     })
+
+    setLoading(false);
   }
 
   function updateForm(key: string) {
@@ -47,9 +55,7 @@ const GeneratePage: NextPage = () => {
     }
   }
 
-  const session = useSession();
 
-  const isLoggedIn = !!session.data
 
   return (<>
     <Head>
@@ -65,11 +71,16 @@ const GeneratePage: NextPage = () => {
           <label className="text-gray-100 font-bold text-lg">Prompt</label>
           <Input value={form.prompt} onChange={updateForm("prompt")} type="text" />
         </FormGroup>
+        <LoadingButton loading={loading} />
 
-        <button className="rounded bg-blue-400 px-4 py-2 hover:bg-blue-500 text-white">Submit</button>
       </form>
 
-      {imageUrl.length > 0 && <Image width="600" height="600" src={`${imageUrl}`} alt="generated image icon" />}
+      {imageUrl.length > 0
+        && <Image
+          width="600"
+          height="600"
+          src={imageUrl}
+          alt="generated image icon" />}
 
       {/* generate a list of image with max 5 columns*/}
       <ul className="grid grid-cols-5 gap-4">
